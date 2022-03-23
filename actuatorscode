@@ -40,7 +40,7 @@ def ConvertTemp(volts, places):
     celsius = round(celsius, places)
     return celsius
 
-def valuestoDB(lux, celsius, dB):
+def valuestoDB(cnt, lux, celsius, dB):
     mydb = mysql.connector.connect(
         host="mysql.studev.groept.be",
         user="a21ib2c06",
@@ -50,8 +50,8 @@ def valuestoDB(lux, celsius, dB):
 
     mycursor = mydb.cursor()
 
-    sql = "INSERT INTO RPI_Data (DateTime, Temperature, Brightness, Noise) VALUES (%s, %s, %s, %s)"
-    val = (datetime.now(), celsius, lux, dB)
+    sql = "INSERT INTO RPI_Data (TimeInt, DateTime, Temperature, Brightness, Noise) VALUES (%s, %s, %s, %s, %s)"
+    val = (cnt, datetime.now(), celsius, lux, dB)
     mycursor.execute(sql, val)
 
     mydb.commit()
@@ -201,8 +201,8 @@ temp_channel = 1
 mic_channel = 0
 
 # Define delay between readings
-delay = 900
-
+delay = 2
+cnt = 0
 
 while True:
     # Read the light sensor data
@@ -222,7 +222,8 @@ while True:
     lux = float((250/light_volts) - 50)
     dB = float(20 * math.log10(mic_volts/0.002))
     #Adding values to database
-    valuestoDB(lux, celsius, dB)
+    valuestoDB(cnt, lux, celsius, dB)
+    cnt += 1
 
     # Print out results
     print("--------------------------------------------")
@@ -234,7 +235,7 @@ while True:
     if (lux < 400):
        if (dB > 30):
             BuzzerActivation()
-            if (celsius > 21)
+            if (celsius > 21):
                 MotorActivation()
 
 
