@@ -36,17 +36,30 @@ def ConvertVolts(data, places):
 # number of decimal places.
 def ConvertTemp(volts, places):
 
-    celsius = ((185.944206 * volts - 358.05793)/(volts - 3.3))
+    celsius = ((185.944206 * volts - 348.05793)/(volts - 3.3))
     celsius = round(celsius, places)
     return celsius
 
-def valuestoDB(cnt, lux, celsius, dB):
-    mydb = mysql.connector.connect(
+def DBconnection ():
+    return mysql.connector.connect(
         host="mysql.studev.groept.be",
         user="a21ib2c06",
         password="secret",
         database="a21ib2c06"
     )
+
+def Manualcontrol():
+    mydb = DBconnection()
+
+    mycursor = mydb.cursor()
+
+    sql = "select * from RPI_Control order by ID DESC LIMIT 1"
+    mycursor.execute(sql)
+    command = mycursor.fetchall()
+    print(command[0][1])
+
+def valuestoDB(cnt, lux, celsius, dB):
+    mydb = DBconnection()
 
     mycursor = mydb.cursor()
 
@@ -202,7 +215,8 @@ mic_channel = 0
 
 # Define delay between readings
 delay = 2
-cnt = 0
+cnt = 1547
+Manualcontrol()
 
 while True:
     # Read the light sensor data
