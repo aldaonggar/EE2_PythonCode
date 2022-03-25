@@ -7,10 +7,8 @@ import mysql.connector
 from datetime import datetime
 
 from RPi import GPIO
-from gpiozero import Buzzer
 from gpiozero import Motor
 from time import sleep
-import os
 
 # Open SPI bus
 spi = spidev.SpiDev()
@@ -31,12 +29,10 @@ def ConvertVolts(data, places):
     volts = round(volts, places)
     return volts
 
-# Function to calculate temperature from
-# TMP36 data, rounded to specified
-# number of decimal places.
+# Function to calculate temperature
 def ConvertTemp(volts, places):
 
-    celsius = ((185.944206 * volts - 348.05793)/(volts - 3.3))
+    celsius = ((volts * 34.36) - 80.3781) / (0.55 * (volts - 3.3))
     celsius = round(celsius, places)
     return celsius
 
@@ -56,6 +52,7 @@ def Manualcontrol():
     sql = "select * from RPI_Control order by ID DESC LIMIT 1"
     mycursor.execute(sql)
     command = mycursor.fetchall()
+    mydb.commit()
     return command
 
 def lastIdFromDB():
@@ -66,15 +63,16 @@ def lastIdFromDB():
     sql = "select TimeInt from RPI_Data order by TimeInt DESC LIMIT 1"
     mycursor.execute(sql)
     lastid = mycursor.fetchall()
+    mydb.commit()
     return int(lastid[0][0])
 
-def valuestoDB(cnt, lux, celsius, dB):
+def valuestoDB(ID, lux, celsius, dB):
     mydb = DBconnection()
 
     mycursor = mydb.cursor()
 
     sql = "INSERT INTO RPI_Data (TimeInt, DateTime, Temperature, Brightness, Noise) VALUES (%s, %s, %s, %s, %s)"
-    val = (cnt, datetime.now(), celsius, lux, dB)
+    val = (ID, datetime.now(), celsius, lux, dB)
     mycursor.execute(sql, val)
 
     mydb.commit()
@@ -225,8 +223,11 @@ mic_channel = 0
 
 # Define delay between readings
 delay = 2
-cnt = lastIdFromDB()
+
+# Number of the last row from control and data table
+ID = lastIdFromDB()
 lastInstructionID = []
+
 while True:
 
     #Reading instruction from RPI_Control and activate particular actuators if desired by the user
@@ -261,10 +262,10 @@ while True:
     lux = float((250/light_volts) - 50)
     dB = float(20 * math.log10(mic_volts/0.005))
 
-    cnt += 1
+    ID += 1
 
     #Adding values to database
-    valuestoDB(cnt, lux, celsius, dB)
+    valuestoDB(ID, lux, celsius, dB)
 
 
     # Print out results
