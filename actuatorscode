@@ -56,7 +56,17 @@ def Manualcontrol():
     sql = "select * from RPI_Control order by ID DESC LIMIT 1"
     mycursor.execute(sql)
     command = mycursor.fetchall()
-    print(command[0][1])
+    return command
+
+def lastIdFromDB():
+    mydb = DBconnection()
+
+    mycursor = mydb.cursor()
+
+    sql = "select TimeInt from RPI_Data order by TimeInt DESC LIMIT 1"
+    mycursor.execute(sql)
+    lastid = mycursor.fetchall()
+    return int(lastid[0][0])
 
 def valuestoDB(cnt, lux, celsius, dB):
     mydb = DBconnection()
@@ -215,8 +225,7 @@ mic_channel = 0
 
 # Define delay between readings
 delay = 2
-cnt = 1547
-Manualcontrol()
+cnt = lastIdFromDB()
 
 while True:
     # Read the light sensor data
@@ -235,9 +244,12 @@ while True:
     #Convert LDR Voltage to lux
     lux = float((250/light_volts) - 50)
     dB = float(20 * math.log10(mic_volts/0.002))
+
+    cnt += 1
+    
     #Adding values to database
     valuestoDB(cnt, lux, celsius, dB)
-    cnt += 1
+
 
     # Print out results
     print("--------------------------------------------")
