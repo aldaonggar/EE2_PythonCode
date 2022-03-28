@@ -222,8 +222,8 @@ temp_channel = 1
 mic_channel = 0
 
 # Define delay between readings
-delay = 0.5
-
+delay = 1
+timecnt = 0
 ID = lastIdFromDB()
 
 while True:
@@ -265,14 +265,15 @@ while True:
     print("Light: {} ({}V)".format(light_level, light_volts))
     print("Temperature : {} ({}V) {} deg C".format(temp_level, temp_volts, celsius))
     print("Noise level: {} ({}V)".format(mic_level, mic_volts))
-    print(dB)
-    #Actuator code below
-    if (lux < 400):
-       if (dB > 30):
-            BuzzerActivation()
-            if (celsius > 21):
-                MotorActivation()
 
+    #Actuator code below
+    if (timecnt % 900 == 0):
+        if (lux < 400):
+            if (dB > 30):
+                BuzzerActivation()
+                if (celsius > 21):
+                    MotorActivation()
+    timecnt += 1
 
 
     # Wait before repeating loop
