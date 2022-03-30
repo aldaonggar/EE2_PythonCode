@@ -252,7 +252,9 @@ while True:
 
     #Convert LDR Voltage to lux
     lux = float((250/light_volts) - 50)
+    lux = round(lux, 2)
     dB = float(20 * math.log10(mic_volts/0.002))
+    dB = round(dB, 2)
 
     ID += 1
 
@@ -267,14 +269,18 @@ while True:
     print("Noise level: {} ({}V)".format(mic_level, mic_volts))
 
     #Actuator code below
-    if (timecnt % 900 == 0):
-        if (lux < 400):
-            if (dB > 30):
-                BuzzerActivation()
-                if (celsius > 21):
-                    MotorActivation()
+    #if (timecnt % 900 == 0):
+    #    if (lux < 400):
+    #        if (dB > 30):
+    #            BuzzerActivation()
+    #            if (celsius > 21):
+    #                MotorActivation()
     timecnt += 1
-
+    if (lux < 400):
+        if (dB > 40):
+            BuzzerActivation()
+            if (celsius > 21):
+               MotorActivation()
 
     # Wait before repeating loop
     time.sleep(delay)
