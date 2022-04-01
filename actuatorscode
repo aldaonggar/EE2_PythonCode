@@ -234,11 +234,9 @@ while True:
     #Reading instruction from RPI_Control and activate particular actuators if desired by the user
     instructions = Manualcontrol()
     if (int(instructions[0][1]) == 1):
-        print(instructions[0][1])
         BuzzerActivation()
     if (int(instructions[0][2]) == 1):
         MotorActivation()
-        print(int(instructions[0][2]))
 
     # Read the light sensor data
     light_level = ReadChannel(light_channel)
@@ -271,18 +269,13 @@ while True:
     print("Noise level: {} ({}V)".format(dB, mic_volts))
 
     #Actuator code below
-    #if (timecnt % 900 == 0):
-    #    if (lux < 400):
-    #        if (dB > 40):
-    #            BuzzerActivation()
-    #            if (celsius > 21):
-    #                MotorActivation()
+    if (timecnt % 900 == 0):
+        if (lux < 400):
+            if (dB > 40):
+                BuzzerActivation()
+                if (celsius > 21):
+                    MotorActivation()
     timecnt += 1
-    if (lux < 400):
-        if (dB > 40):
-            BuzzerActivation()
-            if (celsius > 21):
-               MotorActivation()
 
     # Wait before repeating loop
     time.sleep(delay)
