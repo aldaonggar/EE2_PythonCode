@@ -64,7 +64,10 @@ def lastIdFromDB():
     mycursor.execute(sql)
     lastid = mycursor.fetchall()
     mydb.commit()
-    return int(lastid[0][0])
+    if(str(lastid) == "[]"):
+        return 1
+    else:
+        return int(lastid[0][0])
 
 def valuestoDB(ID, lux, celsius, dB):
     mydb = DBconnection()
@@ -255,7 +258,6 @@ while True:
     lux = round(lux, 2)
     dB = float(20 * math.log10(mic_volts/0.002))
     dB = round(dB, 2)
-
     ID += 1
 
     #Adding values to database
@@ -264,14 +266,14 @@ while True:
 
     # Print out results
     print("--------------------------------------------")
-    print("Light: {} ({}V)".format(light_level, light_volts))
-    print("Temperature : {} ({}V) {} deg C".format(temp_level, temp_volts, celsius))
-    print("Noise level: {} ({}V)".format(mic_level, mic_volts))
+    print("Light: {} ({}V)".format(lux, light_volts))
+    print("Temperature : {} deg C ({}V)".format(celsius, temp_volts))
+    print("Noise level: {} ({}V)".format(dB, mic_volts))
 
     #Actuator code below
     #if (timecnt % 900 == 0):
     #    if (lux < 400):
-    #        if (dB > 30):
+    #        if (dB > 40):
     #            BuzzerActivation()
     #            if (celsius > 21):
     #                MotorActivation()
