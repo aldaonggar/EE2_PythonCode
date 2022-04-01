@@ -270,6 +270,7 @@ while True:
 
     #Actuator code below
     if (timecnt % 900 == 0):
+        timecnt = timecnt - 900
         if (lux < 400):
             if (dB > 40):
                 BuzzerActivation()
